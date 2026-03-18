@@ -1,272 +1,1343 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Immigration Travel System</title>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GlobalPath Immigration Services</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #112240;
+    --navy-light: #1a3560;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-pale: #f5e9c8;
+    --cream: #faf8f3;
+    --white: #ffffff;
+    --gray: #8a9bb5;
+    --gray-light: #e4e9f2;
+    --red: #e05252;
+    --green: #4caf7d;
+    --shadow: 0 8px 40px rgba(10,22,40,0.18);
+    --shadow-sm: 0 2px 12px rgba(10,22,40,0.1);
+    --radius: 16px;
+    --radius-sm: 8px;
+    --transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: #f5f7fa;
+font-family: ‘DM Sans’, sans-serif;
+background: var(–navy);
+color: var(–cream);
+min-height: 100vh;
+overflow-x: hidden;
 }
 
-nav {
-    display: flex;
-    background: #2c3e50;
+/* ── BACKGROUND ── */
+body::before {
+content: ‘’;
+position: fixed; inset: 0;
+background:
+radial-gradient(ellipse 80% 60% at 10% 0%, rgba(201,168,76,0.07) 0%, transparent 60%),
+radial-gradient(ellipse 60% 80% at 90% 100%, rgba(26,53,96,0.6) 0%, transparent 70%),
+linear-gradient(160deg, #0a1628 0%, #0d1e3a 50%, #0a1628 100%);
+z-index: 0;
+pointer-events: none;
 }
 
-nav button {
-    flex: 1;
-    padding: 15px;
-    border: none;
-    background: transparent;
-    color: white;
-    cursor: pointer;
+/* ── HEADER ── */
+header {
+position: sticky; top: 0; z-index: 100;
+background: rgba(10,22,40,0.92);
+backdrop-filter: blur(20px);
+border-bottom: 1px solid rgba(201,168,76,0.15);
+padding: 0 40px;
+display: flex; align-items: center; justify-content: space-between;
+height: 72px;
+animation: slideDown 0.6s ease both;
 }
 
-nav button:hover {
-    background: #34495e;
+@keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.logo {
+display: flex; align-items: center; gap: 12px;
+text-decoration: none; color: inherit;
+}
+.logo-icon {
+width: 40px; height: 40px;
+background: linear-gradient(135deg, var(–gold), var(–gold-light));
+border-radius: 10px;
+display: flex; align-items: center; justify-content: center;
+font-size: 20px;
+box-shadow: 0 4px 16px rgba(201,168,76,0.3);
+}
+.logo-text { font-family: ‘Cormorant Garamond’, serif; font-size: 1.5rem; font-weight: 700; color: var(–white); letter-spacing: 0.01em; }
+.logo-sub { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(–gold); line-height: 1; }
+
+nav { display: flex; gap: 4px; }
+.nav-btn {
+padding: 8px 20px;
+border: none; background: transparent;
+color: var(–gray); font-family: ‘DM Sans’, sans-serif;
+font-size: 0.875rem; font-weight: 500;
+cursor: pointer; border-radius: var(–radius-sm);
+transition: var(–transition); position: relative;
+letter-spacing: 0.02em; white-space: nowrap;
+}
+.nav-btn:hover:not(.disabled) { color: var(–gold-light); background: rgba(201,168,76,0.08); }
+.nav-btn.active { color: var(–gold); background: rgba(201,168,76,0.12); }
+.nav-btn.active::after {
+content: ‘’; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+width: 20px; height: 2px; background: var(–gold); border-radius: 2px;
+}
+.nav-btn.disabled { color: rgba(138,155,181,0.3); cursor: not-allowed; position: relative; }
+.nav-btn.disabled::before {
+content: ‘Coming Soon’;
+position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+background: var(–navy-mid); border: 1px solid rgba(201,168,76,0.2);
+color: var(–gold); font-size: 0.65rem; letter-spacing: 0.08em;
+padding: 4px 10px; border-radius: 4px; white-space: nowrap;
+opacity: 0; pointer-events: none; transition: opacity 0.2s;
+font-weight: 500; text-transform: uppercase;
+}
+.nav-btn.disabled:hover::before { opacity: 1; }
+
+/* ── MAIN LAYOUT ── */
+main { position: relative; z-index: 1; min-height: calc(100vh - 72px); }
+
+.tab-panel { display: none; animation: fadeIn 0.45s ease both; }
+.tab-panel.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── HOME HERO ── */
+.home-hero {
+padding: 64px 40px 40px;
+max-width: 1100px; margin: 0 auto;
+text-align: center;
+}
+.hero-badge {
+display: inline-flex; align-items: center; gap: 8px;
+background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25);
+color: var(–gold); font-size: 0.75rem; font-weight: 600;
+letter-spacing: 0.14em; text-transform: uppercase;
+padding: 6px 16px; border-radius: 100px; margin-bottom: 24px;
+}
+.hero-badge span { width: 6px; height: 6px; background: var(–gold); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.hero-title {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: clamp(2.4rem, 5vw, 4rem);
+font-weight: 700; line-height: 1.15; color: var(–white);
+margin-bottom: 16px;
+}
+.hero-title em { font-style: normal; color: var(–gold); }
+
+.hero-sub { font-size: 1.05rem; color: var(–gray); max-width: 600px; margin: 0 auto 40px; line-height: 1.7; }
+
+/* ── FORM CARD ── */
+.form-card {
+background: rgba(17,34,64,0.7);
+border: 1px solid rgba(201,168,76,0.12);
+border-radius: var(–radius);
+backdrop-filter: blur(12px);
+overflow: hidden;
+max-width: 860px; margin: 0 auto;
+box-shadow: var(–shadow);
 }
 
-.active {
-    background: #1abc9c !important;
+.form-card-header {
+background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+border-bottom: 1px solid rgba(201,168,76,0.15);
+padding: 28px 36px;
+display: flex; align-items: center; justify-content: space-between; flex-wrap: gap;
+gap: 16px;
+}
+.form-card-title { font-family: ‘Cormorant Garamond’, serif; font-size: 1.5rem; font-weight: 700; color: var(–gold-light); }
+.form-card-subtitle { font-size: 0.82rem; color: var(–gray); margin-top: 4px; }
+
+.pdf-option-btn {
+display: flex; align-items: center; gap: 10px;
+background: rgba(201,168,76,0.1);
+border: 1px solid rgba(201,168,76,0.3);
+color: var(–gold); padding: 10px 18px;
+border-radius: var(–radius-sm); font-size: 0.85rem; font-weight: 600;
+cursor: pointer; transition: var(–transition); white-space: nowrap; font-family: ‘DM Sans’,sans-serif;
+}
+.pdf-option-btn:hover { background: rgba(201,168,76,0.2); border-color: var(–gold); transform: translateY(-1px); }
+
+/* ── STEP INDICATOR ── */
+.step-indicator {
+display: flex; align-items: center; padding: 0 36px;
+background: rgba(10,22,40,0.4); border-bottom: 1px solid rgba(201,168,76,0.08);
+overflow-x: auto; gap: 0;
+}
+.step {
+display: flex; align-items: center; gap: 10px;
+padding: 16px 20px 16px 0; cursor: pointer;
+flex-shrink: 0; position: relative;
+}
+.step + .step::before {
+content: ‘›’; color: rgba(201,168,76,0.2); font-size: 1.2rem;
+margin-right: 20px; flex-shrink: 0;
+}
+.step-num {
+width: 28px; height: 28px; border-radius: 50%;
+border: 2px solid rgba(138,155,181,0.3);
+display: flex; align-items: center; justify-content: center;
+font-size: 0.75rem; font-weight: 700; color: var(–gray);
+transition: var(–transition); flex-shrink: 0;
+}
+.step.active .step-num { background: var(–gold); border-color: var(–gold); color: var(–navy); }
+.step.done .step-num { background: var(–green); border-color: var(–green); color: white; }
+.step-label { font-size: 0.78rem; font-weight: 500; color: var(–gray); transition: var(–transition); white-space: nowrap; }
+.step.active .step-label { color: var(–gold); }
+.step.done .step-label { color: var(–green); }
+
+/* ── FORM BODY ── */
+.form-body { padding: 36px; }
+.section-title {
+font-family: ‘Cormorant Garamond’, serif;
+font-size: 1.25rem; font-weight: 700;
+color: var(–gold-light); margin-bottom: 24px;
+display: flex; align-items: center; gap: 10px;
+}
+.section-title::after { content: ‘’; flex: 1; height: 1px; background: rgba(201,168,76,0.15); }
+
+.field-step { display: none; }
+.field-step.active { display: block; animation: fadeIn 0.3s ease both; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-grid.single { grid-template-columns: 1fr; }
+.span-2 { grid-column: span 2; }
+
+.field-group { display: flex; flex-direction: column; gap: 6px; }
+.field-group label { font-size: 0.8rem; font-weight: 600; color: var(–gray); letter-spacing: 0.06em; text-transform: uppercase; }
+
+.field-group input,
+.field-group select,
+.field-group textarea {
+background: rgba(255,255,255,0.04);
+border: 1px solid rgba(201,168,76,0.15);
+border-radius: var(–radius-sm);
+color: var(–cream); padding: 12px 14px;
+font-family: ‘DM Sans’, sans-serif; font-size: 0.92rem;
+transition: var(–transition); outline: none;
+width: 100%;
+-webkit-appearance: none;
+}
+.field-group input:focus,
+.field-group select:focus,
+.field-group textarea:focus {
+border-color: var(–gold);
+background: rgba(201,168,76,0.05);
+box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+}
+.field-group select option { background: var(–navy-mid); color: var(–cream); }
+.field-group input::placeholder, .field-group textarea::placeholder { color: rgba(138,155,181,0.5); }
+
+.radio-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.radio-opt {
+display: flex; align-items: center; gap: 8px;
+background: rgba(255,255,255,0.03);
+border: 1px solid rgba(201,168,76,0.12);
+border-radius: var(–radius-sm);
+padding: 10px 16px; cursor: pointer; transition: var(–transition);
+font-size: 0.88rem; color: var(–gray);
+}
+.radio-opt:hover { border-color: rgba(201,168,76,0.3); color: var(–cream); }
+.radio-opt input[type=radio] { accent-color: var(–gold); }
+.radio-opt.selected { border-color: var(–gold); background: rgba(201,168,76,0.08); color: var(–gold); }
+
+.child-card, .edu-card {
+background: rgba(255,255,255,0.03);
+border: 1px solid rgba(201,168,76,0.1);
+border-radius: var(–radius-sm);
+padding: 20px; margin-bottom: 16px;
+position: relative;
+}
+.child-card-title, .edu-card-title {
+font-size: 0.8rem; font-weight: 700; color: var(–gold);
+letter-spacing: 0.08em; text-transform: uppercase;
+margin-bottom: 16px;
+}
+.add-btn {
+display: flex; align-items: center; gap: 8px;
+background: rgba(201,168,76,0.08);
+border: 1px dashed rgba(201,168,76,0.3);
+color: var(–gold); padding: 12px 20px;
+border-radius: var(–radius-sm); font-size: 0.85rem; font-weight: 600;
+cursor: pointer; transition: var(–transition); width: 100%;
+justify-content: center; font-family: ‘DM Sans’, sans-serif; margin-top: 8px;
+}
+.add-btn:hover { background: rgba(201,168,76,0.15); border-style: solid; }
+
+.remove-btn {
+position: absolute; top: 12px; right: 12px;
+background: rgba(224,82,82,0.1); border: 1px solid rgba(224,82,82,0.2);
+color: var(–red); width: 28px; height: 28px;
+border-radius: 50%; font-size: 1rem; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: var(–transition); line-height: 1;
+}
+.remove-btn:hover { background: rgba(224,82,82,0.2); }
+
+/* ── DOCUMENT UPLOAD ── */
+.upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.upload-zone {
+border: 2px dashed rgba(201,168,76,0.2);
+border-radius: var(–radius);
+padding: 28px 20px;
+text-align: center; cursor: pointer;
+transition: var(–transition); position: relative; overflow: hidden;
+background: rgba(255,255,255,0.02);
+}
+.upload-zone:hover { border-color: var(–gold); background: rgba(201,168,76,0.05); }
+.upload-zone.has-file { border-color: var(–green); background: rgba(76,175,125,0.05); }
+.upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.upload-icon { font-size: 2rem; margin-bottom: 10px; }
+.upload-label { font-size: 0.82rem; font-weight: 700; color: var(–gray); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.upload-hint { font-size: 0.75rem; color: rgba(138,155,181,0.6); }
+.upload-filename { font-size: 0.78rem; color: var(–green); margin-top: 8px; font-weight: 600; }
+
+/* ── NAV BUTTONS ── */
+.form-nav {
+display: flex; justify-content: space-between; align-items: center;
+margin-top: 32px; padding-top: 24px;
+border-top: 1px solid rgba(201,168,76,0.1);
+}
+.btn {
+display: inline-flex; align-items: center; gap: 10px;
+padding: 12px 28px; border-radius: var(–radius-sm);
+font-family: ‘DM Sans’, sans-serif; font-size: 0.9rem; font-weight: 600;
+cursor: pointer; transition: var(–transition); border: none; letter-spacing: 0.02em;
+}
+.btn-primary { background: linear-gradient(135deg, var(–gold), #b8943e); color: var(–navy); box-shadow: 0 4px 20px rgba(201,168,76,0.3); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,168,76,0.4); }
+.btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(–cream); }
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
+.btn-outline { background: transparent; border: 1px solid rgba(201,168,76,0.3); color: var(–gold); }
+.btn-outline:hover { background: rgba(201,168,76,0.08); }
+
+/* ── PDF UPLOAD SECTION ── */
+.pdf-upload-section {
+display: none; padding: 36px;
+border-top: 1px solid rgba(201,168,76,0.1);
+animation: fadeIn 0.3s ease both;
+}
+.pdf-upload-section.active { display: block; }
+
+.pdf-big-zone {
+border: 2px dashed rgba(201,168,76,0.25);
+border-radius: var(–radius);
+padding: 48px; text-align: center; cursor: pointer;
+transition: var(–transition); position: relative;
+background: rgba(201,168,76,0.02);
+}
+.pdf-big-zone:hover { border-color: var(–gold); background: rgba(201,168,76,0.06); }
+.pdf-big-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.pdf-big-icon { font-size: 3.5rem; margin-bottom: 16px; }
+.pdf-big-title { font-family: ‘Cormorant Garamond’, serif; font-size: 1.3rem; font-weight: 700; color: var(–white); margin-bottom: 8px; }
+
+/* ── SUCCESS MODAL ── */
+.modal-overlay {
+position: fixed; inset: 0; z-index: 200;
+background: rgba(5,12,24,0.85); backdrop-filter: blur(8px);
+display: flex; align-items: center; justify-content: center;
+opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.modal-overlay.active { opacity: 1; pointer-events: all; }
+.modal {
+background: var(–navy-mid);
+border: 1px solid rgba(201,168,76,0.2);
+border-radius: var(–radius);
+padding: 48px 40px; max-width: 460px; width: 90%;
+text-align: center; box-shadow: var(–shadow);
+transform: scale(0.9); transition: transform 0.3s;
+}
+.modal-overlay.active .modal { transform: scale(1); }
+.modal-icon { font-size: 3.5rem; margin-bottom: 20px; }
+.modal-title { font-family: ‘Cormorant Garamond’, serif; font-size: 1.8rem; font-weight: 700; color: var(–white); margin-bottom: 12px; }
+.modal-text { color: var(–gray); line-height: 1.7; margin-bottom: 28px; font-size: 0.95rem; }
+.modal-ref { display: inline-block; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2); color: var(–gold); padding: 8px 20px; border-radius: 6px; font-family: ‘DM Mono’, monospace; font-size: 0.9rem; margin-bottom: 24px; }
+
+/* ── TRANSACTIONS ── */
+.trips-page { padding: 48px 40px; max-width: 1100px; margin: 0 auto; }
+.page-header { margin-bottom: 36px; }
+.page-title { font-family: ‘Cormorant Garamond’, serif; font-size: 2.2rem; font-weight: 700; color: var(–white); margin-bottom: 8px; }
+.page-sub { color: var(–gray); font-size: 0.95rem; }
+
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+.stat-card {
+background: rgba(17,34,64,0.7); border: 1px solid rgba(201,168,76,0.1);
+border-radius: var(–radius); padding: 20px; text-align: center;
+backdrop-filter: blur(8px);
+}
+.stat-num { font-family: ‘Cormorant Garamond’, serif; font-size: 2rem; font-weight: 700; color: var(–gold); }
+.stat-label { font-size: 0.78rem; color: var(–gray); margin-top: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead tr { border-bottom: 1px solid rgba(201,168,76,0.15); }
+th { font-size: 0.72rem; font-weight: 700; color: var(–gold); letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 16px; text-align: left; }
+tbody tr {
+border-bottom: 1px solid rgba(255,255,255,0.04);
+transition: background 0.2s;
+}
+tbody tr:hover { background: rgba(201,168,76,0.04); }
+td { padding: 16px; font-size: 0.88rem; color: var(–cream); }
+td .sub { font-size: 0.75rem; color: var(–gray); margin-top: 2px; }
+.badge {
+display: inline-flex; align-items: center; gap: 6px;
+padding: 4px 12px; border-radius: 100px; font-size: 0.73rem; font-weight: 700;
+letter-spacing: 0.06em; text-transform: uppercase;
+}
+.badge-processing { background: rgba(201,168,76,0.12); color: var(–gold); }
+.badge-completed { background: rgba(76,175,125,0.12); color: var(–green); }
+.badge-pending { background: rgba(138,155,181,0.12); color: var(–gray); }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge-processing .badge-dot { animation: pulse 1.5s infinite; }
+
+.empty-state { text-align: center; padding: 60px; color: var(–gray); }
+.empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.4; }
+
+/* ── TERMS ── */
+.terms-page { padding: 48px 40px; max-width: 960px; margin: 0 auto; }
+.terms-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 36px; }
+.terms-tag {
+background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.15);
+color: var(–gold); padding: 6px 16px; border-radius: 100px;
+font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: var(–transition);
+letter-spacing: 0.04em;
+}
+.terms-tag:hover, .terms-tag.active { background: rgba(201,168,76,0.2); border-color: var(–gold); }
+
+.terms-section { display: none; animation: fadeIn 0.3s ease both; }
+.terms-section.active { display: block; }
+
+.continent-card {
+background: rgba(17,34,64,0.6); border: 1px solid rgba(201,168,76,0.1);
+border-radius: var(–radius); overflow: hidden; margin-bottom: 24px;
+backdrop-filter: blur(8px);
+}
+.continent-header {
+padding: 20px 28px;
+background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.02));
+border-bottom: 1px solid rgba(201,168,76,0.1);
+display: flex; align-items: center; gap: 14px;
+}
+.continent-flag { font-size: 1.6rem; }
+.continent-name { font-family: ‘Cormorant Garamond’, serif; font-size: 1.2rem; font-weight: 700; color: var(–gold-light); }
+.continent-dest { font-size: 0.78rem; color: var(–gray); margin-top: 2px; }
+.continent-body { padding: 24px 28px; }
+.terms-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.terms-list li { display: flex; gap: 12px; font-size: 0.88rem; color: var(–cream); line-height: 1.6; }
+.terms-list li::before { content: ‘✦’; color: var(–gold); font-size: 0.7rem; flex-shrink: 0; margin-top: 3px; }
+
+.general-terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.general-term-card {
+background: rgba(17,34,64,0.6); border: 1px solid rgba(201,168,76,0.1);
+border-radius: var(–radius); padding: 24px;
+backdrop-filter: blur(8px);
+}
+.gtc-icon { font-size: 1.6rem; margin-bottom: 12px; }
+.gtc-title { font-family: ‘Cormorant Garamond’, serif; font-size: 1.05rem; font-weight: 700; color: var(–white); margin-bottom: 10px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+header { padding: 0 16px; }
+nav { gap: 2px; }
+.nav-btn { padding: 8px 12px; font-size: 0.78rem; }
+.home-hero { padding: 32px 16px 24px; }
+.form-card-header { padding: 20px; }
+.form-body { padding: 20px; }
+.step-indicator { padding: 0 16px; }
+.form-grid { grid-template-columns: 1fr; }
+.span-2 { grid-column: span 1; }
+.upload-grid { grid-template-columns: 1fr; }
+.trips-page, .terms-page { padding: 28px 16px; }
+.stats-row { grid-template-columns: repeat(2, 1fr); }
+.general-terms-grid { grid-template-columns: 1fr; }
 }
 
-.container {
-    padding: 20px;
-}
-
-.hidden {
-    display: none;
-}
-
-input, select {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0 15px;
-}
-
-.section {
-    background: white;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-}
-
-button.submit {
-    background: #1abc9c;
-    color: white;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-}
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 3px; }
 </style>
-</head>
 
+</head>
 <body>
 
-<nav>
-<button onclick="showTab('home')" class="active">Home</button>
-<button onclick="showTab('transactions')">Trips & Transactions</button>
-<button onclick="showTab('terms')">Terms & Conditions</button>
-<button onclick="alert('This feature is currently inactive')">Travel Schedule</button>
-</nav>
+<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
 
-<div class="container">
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">✈</div>
+    <div>
+      <div class="logo-text">GlobalPath</div>
+      <div class="logo-sub">Immigration Services</div>
+    </div>
+  </a>
+  <nav>
+    <button class="nav-btn active" onclick="switchTab('home', this)">Home</button>
+    <button class="nav-btn" onclick="switchTab('trips', this)">Trips & Transactions</button>
+    <button class="nav-btn" onclick="switchTab('terms', this)">Terms & Conditions</button>
+    <button class="nav-btn disabled" onclick="return false" title="Coming Soon">Travel Schedules</button>
+  </nav>
+</header>
 
-<!-- HOME -->
-<div id="home">
+<main>
 
-<h2>Immigration Assessment</h2>
+<!-- ═══════════════════════════ HOME ═══════════════════════════ -->
 
-<div class="section">
-<h3>Alternative Option</h3>
-<p>Download and fill manually:</p>
-<a href="#" download>Download PDF Form</a>
-<br><br>
-<label>Upload Completed PDF:</label>
-<input type="file" id="pdfUpload">
+<div id="tab-home" class="tab-panel active">
+  <div class="home-hero">
+    <div class="hero-badge"><span></span> Official Immigration Assessment Portal</div>
+    <h1 class="hero-title">Begin Your<br><em>Global Journey</em></h1>
+    <p class="hero-sub">Complete your immigration assessment below. Fill out the digital form or download our PDF, then submit your completed documents for review.</p>
+  </div>
+
+  <div style="max-width:860px;margin:0 auto 16px;padding:0 40px;">
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="showOnlineForm()">📋 Fill Online Form</button>
+      <button class="btn btn-outline" onclick="downloadPDF()">⬇ Download PDF Form</button>
+      <button class="btn btn-secondary" onclick="showPDFUpload()">📤 Upload Completed PDF</button>
+    </div>
+  </div>
+
+  <!-- ONLINE FORM -->
+
+  <div id="onlineFormSection" style="padding:0 40px 60px;">
+    <div class="form-card">
+      <div class="form-card-header">
+        <div>
+          <div class="form-card-title">Immigration Assessment Questionnaire</div>
+          <div class="form-card-subtitle">Please complete all sections accurately. Fields marked are required.</div>
+        </div>
+      </div>
+
+```
+  <!-- Step Indicator -->
+  <div class="step-indicator">
+    <div class="step active" onclick="goToStep(1)">
+      <div class="step-num">1</div>
+      <div class="step-label">Personal Info</div>
+    </div>
+    <div class="step" onclick="goToStep(2)">
+      <div class="step-num">2</div>
+      <div class="step-label">Spouse</div>
+    </div>
+    <div class="step" onclick="goToStep(3)">
+      <div class="step-num">3</div>
+      <div class="step-label">Children</div>
+    </div>
+    <div class="step" onclick="goToStep(4)">
+      <div class="step-num">4</div>
+      <div class="step-label">Education</div>
+    </div>
+    <div class="step" onclick="goToStep(5)">
+      <div class="step-num">5</div>
+      <div class="step-label">Documents</div>
+    </div>
+  </div>
+
+  <div class="form-body">
+
+    <!-- STEP 1: Personal Info -->
+    <div class="field-step active" id="step1">
+      <div class="section-title">Section A — Personal Information</div>
+      <div class="form-grid">
+        <div class="field-group span-2">
+          <label>Full Name</label>
+          <input type="text" id="fullName" placeholder="Enter your full legal name" />
+        </div>
+        <div class="field-group">
+          <label>Phone Number</label>
+          <input type="tel" id="phone" placeholder="+1 (000) 000-0000" />
+        </div>
+        <div class="field-group">
+          <label>Date of Birth</label>
+          <input type="date" id="dob" />
+        </div>
+        <div class="field-group">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="your@email.com" />
+        </div>
+        <div class="field-group">
+          <label>Place of Birth</label>
+          <input type="text" id="pob" placeholder="City, Country" />
+        </div>
+        <div class="field-group span-2">
+          <label>Civil Status</label>
+          <div class="radio-group" id="civilStatus">
+            <label class="radio-opt"><input type="radio" name="civil" value="Single" onchange="handleRadio('civilStatus', this)"> Single</label>
+            <label class="radio-opt"><input type="radio" name="civil" value="Married" onchange="handleRadio('civilStatus', this); toggleSpouse(true)"> Married</label>
+            <label class="radio-opt"><input type="radio" name="civil" value="Divorced" onchange="handleRadio('civilStatus', this); toggleSpouse(false)"> Divorced</label>
+            <label class="radio-opt"><input type="radio" name="civil" value="Widowed" onchange="handleRadio('civilStatus', this); toggleSpouse(false)"> Widowed</label>
+          </div>
+        </div>
+        <div class="field-group span-2">
+          <label>Gender</label>
+          <div class="radio-group" id="genderGroup">
+            <label class="radio-opt"><input type="radio" name="gender" value="Male" onchange="handleRadio('genderGroup', this)"> Male</label>
+            <label class="radio-opt"><input type="radio" name="gender" value="Female" onchange="handleRadio('genderGroup', this)"> Female</label>
+            <label class="radio-opt"><input type="radio" name="gender" value="Prefer not to say" onchange="handleRadio('genderGroup', this)"> Prefer not to say</label>
+            <label class="radio-opt"><input type="radio" name="gender" value="Other" onchange="handleRadio('genderGroup', this); document.getElementById('genderOther').style.display='block'"> Other</label>
+          </div>
+          <input type="text" id="genderOther" placeholder="Please specify" style="display:none;margin-top:8px;" />
+        </div>
+      </div>
+      <div class="form-nav">
+        <div></div>
+        <button class="btn btn-primary" onclick="nextStep(1)">Next — Spouse Info →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Spouse -->
+    <div class="field-step" id="step2">
+      <div class="section-title">Section B — Spouse Information</div>
+      <div id="spouseFields">
+        <div class="form-grid">
+          <div class="field-group span-2">
+            <label>Spouse's Full Name</label>
+            <input type="text" id="spouseName" placeholder="Full legal name" />
+          </div>
+          <div class="field-group">
+            <label>Spouse's Phone</label>
+            <input type="tel" id="spousePhone" placeholder="+1 (000) 000-0000" />
+          </div>
+          <div class="field-group">
+            <label>Spouse's Email</label>
+            <input type="email" id="spouseEmail" placeholder="spouse@email.com" />
+          </div>
+          <div class="field-group">
+            <label>Spouse's Date of Birth</label>
+            <input type="date" id="spouseDob" />
+          </div>
+          <div class="field-group">
+            <label>Spouse's Place of Birth</label>
+            <input type="text" id="spousePob" placeholder="City, Country" />
+          </div>
+          <div class="field-group span-2">
+            <label>Spouse's Gender</label>
+            <div class="radio-group" id="spouseGender">
+              <label class="radio-opt"><input type="radio" name="spouseGender" value="Male" onchange="handleRadio('spouseGender', this)"> Male</label>
+              <label class="radio-opt"><input type="radio" name="spouseGender" value="Female" onchange="handleRadio('spouseGender', this)"> Female</label>
+              <label class="radio-opt"><input type="radio" name="spouseGender" value="Prefer not to say" onchange="handleRadio('spouseGender', this)"> Prefer not to say</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="spouseNA" style="display:none; padding: 32px; text-align:center; color:var(--gray);">
+        <div style="font-size:2rem;margin-bottom:12px;">💍</div>
+        <div>This section applies only if you are married.<br>You may proceed to the next step.</div>
+      </div>
+      <div class="form-nav">
+        <button class="btn btn-secondary" onclick="prevStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(2)">Next — Children →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Children -->
+    <div class="field-step" id="step3">
+      <div class="section-title">Section C — Children Information</div>
+      <div class="form-grid" style="margin-bottom:24px;">
+        <div class="field-group">
+          <label>How many children do you have?</label>
+          <input type="number" id="numChildren" min="0" max="20" placeholder="0" oninput="updateChildFields()" />
+        </div>
+      </div>
+      <div id="childrenContainer"></div>
+      <div class="form-nav">
+        <button class="btn btn-secondary" onclick="prevStep(3)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(3)">Next — Education →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Education -->
+    <div class="field-step" id="step4">
+      <div class="section-title">Section D — Educational Attainment</div>
+      <div id="eduContainer">
+        <div class="edu-card" id="edu-0">
+          <div class="edu-card-title">Education Record 1</div>
+          <div class="form-grid">
+            <div class="field-group span-2"><label>Name of School / Institution</label><input type="text" placeholder="e.g., University of Lagos" /></div>
+            <div class="field-group"><label>Level / Degree Completed</label>
+              <select><option value="">Select level</option><option>Primary</option><option>Secondary / High School</option><option>Diploma / Certificate</option><option>Bachelor's Degree</option><option>Master's Degree</option><option>Doctorate (PhD)</option><option>Other</option></select>
+            </div>
+            <div class="field-group"><label>Date Completed</label><input type="date" /></div>
+            <div class="field-group"><label>Last Attended</label><input type="date" /></div>
+          </div>
+        </div>
+      </div>
+      <button class="add-btn" onclick="addEduRecord()">+ Add Another Education Record</button>
+      <div class="form-nav">
+        <button class="btn btn-secondary" onclick="prevStep(4)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(4)">Next — Documents →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Documents -->
+    <div class="field-step" id="step5">
+      <div class="section-title">Required Documents — Upload Images</div>
+      <p style="color:var(--gray);font-size:0.88rem;margin-bottom:24px;line-height:1.6;">Please upload clear images or scans of the following documents. Accepted formats: JPG, PNG, PDF. Max 10MB each.</p>
+      <div class="upload-grid">
+        <div class="upload-zone" id="zone-passport-photo" onclick="triggerUpload('up-passport-photo')">
+          <input type="file" id="up-passport-photo" accept="image/*" onchange="handleFileUpload(this, 'zone-passport-photo', 'fn-passport-photo')" />
+          <div class="upload-icon">🤳</div>
+          <div class="upload-label">Passport Photo</div>
+          <div class="upload-hint">Recent passport-size photograph of applicant</div>
+          <div class="upload-filename" id="fn-passport-photo"></div>
+        </div>
+        <div class="upload-zone" id="zone-intl-id" onclick="triggerUpload('up-intl-id')">
+          <input type="file" id="up-intl-id" accept="image/*,.pdf" onchange="handleFileUpload(this, 'zone-intl-id', 'fn-intl-id')" />
+          <div class="upload-icon">🪪</div>
+          <div class="upload-label">International ID Card</div>
+          <div class="upload-hint">Internationally recognized government-issued ID</div>
+          <div class="upload-filename" id="fn-intl-id"></div>
+        </div>
+        <div class="upload-zone" id="zone-passport" onclick="triggerUpload('up-passport')">
+          <input type="file" id="up-passport" accept="image/*,.pdf" onchange="handleFileUpload(this, 'zone-passport', 'fn-passport')" />
+          <div class="upload-icon">📘</div>
+          <div class="upload-label">International Travel Passport</div>
+          <div class="upload-hint">Valid international travel passport (data page)</div>
+          <div class="upload-filename" id="fn-passport"></div>
+        </div>
+        <div class="upload-zone" id="zone-guarantor" onclick="triggerUpload('up-guarantor')">
+          <input type="file" id="up-guarantor" accept="image/*,.pdf" onchange="handleFileUpload(this, 'zone-guarantor', 'fn-guarantor')" />
+          <div class="upload-icon">🤝</div>
+          <div class="upload-label">Guarantor's ID</div>
+          <div class="upload-hint">ID card of guarantor in destination country</div>
+          <div class="upload-filename" id="fn-guarantor"></div>
+        </div>
+      </div>
+      <div class="form-nav">
+        <button class="btn btn-secondary" onclick="prevStep(5)">← Back</button>
+        <button class="btn btn-primary" onclick="submitForm()">Submit Application ✈</button>
+      </div>
+    </div>
+
+  </div><!-- /form-body -->
+</div><!-- /form-card -->
+```
+
+  </div><!-- /online form -->
+
+  <!-- PDF UPLOAD SECTION -->
+
+  <div id="pdfUploadSection" class="pdf-upload-section" style="max-width:860px;margin:0 auto;padding:0 40px 60px;">
+    <div class="form-card">
+      <div class="form-card-header">
+        <div>
+          <div class="form-card-title">Submit Completed PDF Form</div>
+          <div class="form-card-subtitle">Upload your filled PDF questionnaire along with your supporting documents.</div>
+        </div>
+        <button class="pdf-option-btn" onclick="showOnlineForm()">← Switch to Online Form</button>
+      </div>
+      <div style="padding:36px;">
+        <div class="pdf-big-zone" id="pdfBigZone">
+          <input type="file" id="pdfFileInput" accept=".pdf" onchange="handlePDFUpload(this)" />
+          <div class="pdf-big-icon">📄</div>
+          <div class="pdf-big-title">Drop your PDF here or click to browse</div>
+          <div style="color:var(--gray);font-size:0.85rem;margin-top:8px;">Accepted: PDF only · Max 20MB</div>
+          <div id="pdfFileName" style="margin-top:16px;color:var(--green);font-weight:700;font-size:0.9rem;"></div>
+        </div>
+        <div style="margin-top:32px;">
+          <div class="section-title" style="margin-bottom:20px;">Supporting Documents</div>
+          <div class="upload-grid">
+            <div class="upload-zone" onclick="triggerUpload('pdf-photo')">
+              <input type="file" id="pdf-photo" accept="image/*" onchange="handleFileUpload(this,'','pdf-photo-fn')" />
+              <div class="upload-icon">🤳</div><div class="upload-label">Passport Photo</div>
+              <div class="upload-filename" id="pdf-photo-fn"></div>
+            </div>
+            <div class="upload-zone" onclick="triggerUpload('pdf-intlid')">
+              <input type="file" id="pdf-intlid" accept="image/*,.pdf" onchange="handleFileUpload(this,'','pdf-intlid-fn')" />
+              <div class="upload-icon">🪪</div><div class="upload-label">International ID Card</div>
+              <div class="upload-filename" id="pdf-intlid-fn"></div>
+            </div>
+            <div class="upload-zone" onclick="triggerUpload('pdf-passport')">
+              <input type="file" id="pdf-passport" accept="image/*,.pdf" onchange="handleFileUpload(this,'','pdf-passport-fn')" />
+              <div class="upload-icon">📘</div><div class="upload-label">Travel Passport</div>
+              <div class="upload-filename" id="pdf-passport-fn"></div>
+            </div>
+            <div class="upload-zone" onclick="triggerUpload('pdf-guarantor')">
+              <input type="file" id="pdf-guarantor" accept="image/*,.pdf" onchange="handleFileUpload(this,'','pdf-guarantor-fn')" />
+              <div class="upload-icon">🤝</div><div class="upload-label">Guarantor's ID</div>
+              <div class="upload-filename" id="pdf-guarantor-fn"></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-nav">
+          <div></div>
+          <button class="btn btn-primary" onclick="submitPDFForm()">Submit PDF Application ✈</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-home -->
+
+<!-- ═══════════════════════════ TRIPS & TRANSACTIONS ═══════════════════════════ -->
+
+<div id="tab-trips" class="tab-panel">
+  <div class="trips-page">
+    <div class="page-header">
+      <h1 class="page-title">Trips & Transactions</h1>
+      <p class="page-sub">Track all your submissions, applications, and travel history.</p>
+    </div>
+
+```
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-num" id="stat-total">0</div>
+    <div class="stat-label">Total Submissions</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" id="stat-processing">0</div>
+    <div class="stat-label">Processing</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" id="stat-completed">0</div>
+    <div class="stat-label">Completed</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" id="stat-trips">0</div>
+    <div class="stat-label">Trips Taken</div>
+  </div>
 </div>
 
-<form id="form">
+<div style="background:rgba(17,34,64,0.6);border:1px solid rgba(201,168,76,0.1);border-radius:var(--radius);backdrop-filter:blur(8px);overflow:hidden;">
+  <div style="padding:20px 24px;border-bottom:1px solid rgba(201,168,76,0.08);display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--white);">Submission History</div>
+    <div id="noDataBadge" style="font-size:0.75rem;color:var(--gray);">No submissions yet</div>
+  </div>
+  <div class="table-wrap" id="transactionsTable">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📋</div>
+      <div style="font-size:1rem;margin-bottom:8px;">No submissions yet</div>
+      <div style="font-size:0.85rem;">Complete the Home form to see your applications here.</div>
+    </div>
+    <table id="txTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Applicant</th>
+          <th>Type</th>
+          <th>Date Submitted</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="txBody"></tbody>
+    </table>
+  </div>
+</div>
+```
 
-<div class="section">
-<h3>Personal Information</h3>
-<input placeholder="Full Name" id="name">
-<input placeholder="Phone Number">
-<input type="date">
-<input placeholder="Email">
-<input placeholder="Place of Birth">
-
-<select id="status">
-<option>Single</option>
-<option>Married</option>
-<option>Divorced</option>
-<option>Widowed</option>
-</select>
-
-<select>
-<option>Male</option>
-<option>Female</option>
-<option>Prefer not to say</option>
-<option>Other</option>
-</select>
+  </div>
 </div>
 
-<div class="section hidden" id="spouseSection">
-<h3>Spouse Info</h3>
-<input placeholder="Spouse Name">
-<input placeholder="Spouse Phone">
-<input placeholder="Spouse Email">
-<input type="date">
-<input placeholder="Spouse Place of Birth">
+<!-- ═══════════════════════════ TERMS ═══════════════════════════ -->
+
+<div id="tab-terms" class="tab-panel">
+  <div class="terms-page">
+    <div class="page-header">
+      <h1 class="page-title">Terms & Conditions</h1>
+      <p class="page-sub">International travel regulations, required documents, and general rules for your destination.</p>
+    </div>
+
+```
+<div class="terms-nav">
+  <div class="terms-tag active" onclick="showTermsSection('overview', this)">Overview</div>
+  <div class="terms-tag" onclick="showTermsSection('asia', this)">🌏 Asia</div>
+  <div class="terms-tag" onclick="showTermsSection('africa', this)">🌍 Africa</div>
+  <div class="terms-tag" onclick="showTermsSection('namerica', this)">🌎 North America</div>
+  <div class="terms-tag" onclick="showTermsSection('samerica', this)">🌎 South America</div>
+  <div class="terms-tag" onclick="showTermsSection('europe', this)">🏛 Europe</div>
+  <div class="terms-tag" onclick="showTermsSection('australia', this)">🦘 Australia</div>
+  <div class="terms-tag" onclick="showTermsSection('general', this)">📜 General Rules</div>
 </div>
 
-<div class="section">
-<h3>Children</h3>
-<input type="number" id="childrenCount" placeholder="Number of children">
-<div id="childrenContainer"></div>
+<!-- Overview -->
+<div class="terms-section active" id="terms-overview">
+  <div class="continent-card">
+    <div class="continent-header"><div class="continent-flag">🌐</div><div><div class="continent-name">GlobalPath International Travel Standards</div><div class="continent-dest">Covering all major intercontinental routes</div></div></div>
+    <div class="continent-body">
+      <ul class="terms-list">
+        <li>All travelers must possess a valid international passport with a minimum of 6 months validity beyond the intended stay.</li>
+        <li>Visa requirements vary by nationality and destination. Applicants must verify visa eligibility prior to booking travel.</li>
+        <li>GlobalPath Immigration Services facilitates applications but does not guarantee visa approval — final decisions rest with immigration authorities.</li>
+        <li>Submission of false, altered, or fraudulent documents will result in immediate rejection and may lead to legal consequences.</li>
+        <li>All documents submitted must be original or certified copies. Photocopies without notarization are not accepted.</li>
+        <li>Processing times vary: standard 10–15 business days; express 5–7 business days (additional fees apply).</li>
+        <li>Applicants must maintain health insurance valid in their destination country for the duration of travel.</li>
+        <li>GlobalPath reserves the right to request additional documentation at any stage of the process.</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
-<div class="section">
-<h3>Education</h3>
-<input placeholder="School Name">
-<input placeholder="Degree">
-<input type="date">
-<input placeholder="Last Attended">
+<!-- Asia -->
+<div class="terms-section" id="terms-asia">
+  <div class="continent-card">
+    <div class="continent-header"><div class="continent-flag">🌏</div><div><div class="continent-name">Asia</div><div class="continent-dest">Dubai (UAE) · Japan · Singapore · India · China · Thailand</div></div></div>
+    <div class="continent-body">
+      <ul class="terms-list">
+        <li><strong>Dubai (UAE):</strong> Visa on arrival available for many nationalities for stays up to 30 days. Tourist visa extensions available in-country. No visa required for GCC residents.</li>
+        <li><strong>Japan:</strong> Visa-free entry for up to 90 days for many nationalities. Work and student visas require sponsorship and prior approval.</li>
+        <li><strong>Singapore:</strong> Visa-free for most Commonwealth and EU nationals for 30–90 days. All travelers must show proof of onward/return travel.</li>
+        <li><strong>India:</strong> e-Visa available online for most nationalities. Medical and employment visas require specific supporting letters.</li>
+        <li><strong>Required Documents for Asia travel:</strong> Valid passport, return flight ticket, hotel booking confirmation, proof of funds (minimum $1,000 USD equivalent), travel insurance, and guarantor ID where required.</li>
+        <li><strong>Transitional Movements:</strong> Transit visas required for layovers exceeding 24 hours in UAE, China (without TWOV eligibility), and India.</li>
+        <li><strong>Prohibited Items:</strong> Strict drug laws apply across all Asian destinations. UAE has zero tolerance for controlled substances. Penalties include life imprisonment or deportation.</li>
+        <li><strong>Cultural Rules:</strong> Dress modestly in Dubai and other Islamic destinations. Religious sites require specific dress codes throughout Asia.</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
-<div class="section">
-<h3>Upload Required Documents</h3>
-<label>Passport Photo</label>
-<input type="file">
-
-<label>ID Card</label>
-<input type="file">
-
-<label>Travel Passport</label>
-<input type="file">
-
-<label>Guarantor ID</label>
-<input type="file">
+<!-- Africa -->
+<div class="terms-section" id="terms-africa">
+  <div class="continent-card">
+    <div class="continent-header"><div class="continent-flag">🌍</div><div><div class="continent-name">Africa</div><div class="continent-dest">South Africa · Morocco · Nigeria · Kenya · Egypt · Ghana</div></div></div>
+    <div class="continent-body">
+      <ul class="terms-list">
+        <li><strong>South Africa:</strong> Visa-free for most EU, UK, and US nationals for up to 90 days. Yellow fever vaccination required if arriving from endemic countries.</li>
+        <li><strong>Morocco:</strong> Visa-free for 90 days for most Western passports. Travelers must have accommodation bookings confirmed prior to entry.</li>
+        <li><strong>Kenya:</strong> Single-entry East Africa Tourist Visa (shared with Uganda and Rwanda) available. e-Visa mandatory for most nationalities.</li>
+        <li><strong>Egypt:</strong> Visa on arrival available for many nationalities ($25 USD fee). Sinai-only permit is cheaper but restricts movement to Red Sea coastal areas.</li>
+        <li><strong>Required Documents:</strong> Valid passport (6+ months validity), proof of funds, vaccination certificate (Yellow Fever, COVID-19 where required), travel insurance, return ticket.</li>
+        <li><strong>Transitional Movements:</strong> Intra-Africa travel may require additional transit visas. Nigerian airports do not offer transit visas — connecting passengers must hold full Nigerian visas.</li>
+        <li><strong>Health Requirements:</strong> Yellow fever vaccination card is mandatory when entering many African nations from endemic regions. Malaria prophylaxis strongly recommended.</li>
+        <li><strong>Currency:</strong> Foreign exchange must be declared upon entry in South Africa if carrying ZAR 25,000 or more or equivalent.</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
-<button type="button" class="submit" onclick="submitForm()">Submit</button>
-
-</form>
+<!-- North America -->
+<div class="terms-section" id="terms-namerica">
+  <div class="continent-card">
+    <div class="continent-header"><div class="continent-flag">🌎</div><div><div class="continent-name">North America</div><div class="continent-dest">United States · Canada · Mexico · Caribbean</div></div></div>
+    <div class="continent-body">
+      <ul class="terms-list">
+        <li><strong>United States:</strong> ESTA (Electronic System for Travel Authorization) required for Visa Waiver Program countries. All other nationalities must obtain a B-1/B-2 tourist visa through US Embassy.</li>
+        <li><strong>Canada:</strong> eTA (Electronic Travel Authorization) required for visa-exempt nationals traveling by air. Biometrics required for most non-exempt applicants.</li>
+        <li><strong>Mexico:</strong> Visa-free entry for most nationalities. FMM tourist card required on arrival (completed on arrival or online).</li>
+        <li><strong>Required Documents:</strong> Valid passport, visa/ESTA/eTA, proof of accommodation, return tickets, bank statements (3 months minimum), travel insurance covering $100,000+ medical.</li>
+        <li><strong>US Border Entry:</strong> CBSA and CBP officers have broad authority to question and search. All electronic devices may be searched at port of entry.</li>
+        <li><strong>Transitional Movements:</strong> Transit through the US requires a valid US visa or ESTA even for layovers, unless connecting airside without clearing customs.</li>
+        <li><strong>Canada–US Border:</strong> Crossing by land requires NEXUS card or full visa documentation. Pre-clearance available at major Canadian airports for US-bound flights.</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
-<!-- TRANSACTIONS -->
-<div id="transactions" class="hidden">
-<h2>Trips & Transactions</h2>
-<ul id="transactionList"></ul>
+<!-- South America -->
+<div class="terms-section" id="terms-samerica">
+  <div class="continent-card">
+    <div class="continent-header"><div class="continent-flag">🌎</div><div><div class="continent-name">South America</div><div class="continent-dest">Brazil · Argentina · Colombia · Peru · Chile</div></div></div>
+    <div class="continent-body">
+      <ul class="terms-list">
+        <li><strong>Brazil:</strong> Visa-free for most Western passports. US, Canada, and Australian citizens now enjoy visa-free access. Yellow fever vaccination required for Amazon region visits.</li>
+        <li><strong>Argentina:</strong> Visa-free for most nationalities up to 90 days. Citizens of some nations pay a reciprocity fee online before travel.</li>
+        <li><strong>Colombia:</strong> Visa-free for most nationalities for 90 days (extendable to 180 days per year). Onward ticket required at entry.</li>
+        <li><strong>Peru:</strong> Visa-free for most nationalities. Altitude sickness preparation advisable for Machu Picchu and Andean destinations (3,400m+).</li>
+        <li><strong>Required Documents:</strong> Valid passport, onward/return ticket, proof of sufficient funds, travel insurance, accommodation confirmation.</li>
+        <li><strong>Transitional Movements:</strong> South American nations share Mercosur agreements allowing ID-only travel between member states for citizens. Foreign nationals still require full passport documentation.</li>
+        <li><strong>Health Advisory:</strong> Yellow fever, typhoid, and hepatitis A vaccinations strongly recommended. Some Brazilian regions have Zika virus risk — pregnant travelers should consult physicians.</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
-<!-- TERMS -->
-<div id="terms" class="hidden">
-<h2>Terms & Conditions</h2>
-
-<p><b>Regions Covered:</b></p>
-<ul>
-<li>Asia (Dubai, etc.)</li>
-<li>Africa (South Africa, Morocco)</li>
-<li>North America</li>
-<li>South America</li>
-<li>Europe</li>
-<li>Australia</li>
-</ul>
-
-<p><b>Requirements:</b></p>
-<ul>
-<li>Valid Passport</li>
-<li>Visa (where required)</li>
-<li>Health and travel insurance</li>
-<li>Proof of accommodation</li>
-<li>Financial capability</li>
-</ul>
-
-<p><b>Rules:</b></p>
-<ul>
-<li>Follow immigration laws of destination country</li>
-<li>No overstaying</li>
-<li>Respect transit country regulations</li>
-</ul>
-
+<!-- Europe -->
+<div class="terms-section" id="terms-europe">
+  <div class="continent-card">
+    <div class="continent-header"><div class="continent-flag">🏛</div><div><div class="continent-name">Europe</div><div class="continent-dest">Schengen Area · UK · Switzerland · Norway · Iceland</div></div></div>
+    <div class="continent-body">
+      <ul class="terms-list">
+        <li><strong>Schengen Area (26 countries):</strong> Single Schengen visa grants access to all member states for up to 90 days in any 180-day period. First point of entry must be the main destination country's embassy visa.</li>
+        <li><strong>United Kingdom:</strong> No longer in Schengen. Separate UK Standard Visitor Visa required for non-exempt nationals. ETA (Electronic Travel Authorisation) now required for visa-exempt nationals arriving by air.</li>
+        <li><strong>ETIAS (Coming Soon):</strong> EU ETIAS travel authorization will be required for all non-EU/EEA visa-exempt nationals from 2025 onward. Apply online prior to departure.</li>
+        <li><strong>Required Documents:</strong> Passport (valid 3+ months beyond intended stay), visa/ETIAS, travel insurance (minimum €30,000 medical coverage), round-trip tickets, proof of accommodation and funds.</li>
+        <li><strong>Transitional Movements:</strong> Internal Schengen borders are open. Non-EU nationals are subject to random checks. Keep travel documents accessible at all times within the Schengen zone.</li>
+        <li><strong>Customs:</strong> Strict limits on alcohol, tobacco, and cash (€10,000+) declarations required when entering the Schengen zone from outside.</li>
+        <li><strong>Student / Work Visas:</strong> Separate long-stay national visas (D-visas) required for stays exceeding 90 days. These must be applied at individual country embassies.</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
+<!-- Australia -->
+<div class="terms-section" id="terms-australia">
+  <div class="continent-card">
+    <div class="continent-header"><div class="continent-flag">🦘</div><div><div class="continent-name">Australia & Oceania</div><div class="continent-dest">Australia · New Zealand · Fiji · Papua New Guinea</div></div></div>
+    <div class="continent-body">
+      <ul class="terms-list">
+        <li><strong>Australia:</strong> All non-citizen visitors must hold a valid Australian visa. The eVisitor (subclass 651) and ETA (subclass 601) are available to eligible passport holders online.</li>
+        <li><strong>Tourist Visa (subclass 600):</strong> Required for nationalities not eligible for eVisitor or ETA. Allows stays of up to 3, 6, or 12 months depending on approval.</li>
+        <li><strong>New Zealand:</strong> NZeTA (Electronic Travel Authority) required for visa-waiver countries. International Visitor Conservation and Tourism Levy (IVL) applies — NZD $35 per entry.</li>
+        <li><strong>Required Documents:</strong> Valid passport (6+ months), valid Australian/NZ visa or ETA, return air ticket, proof of accommodation, travel insurance, sufficient funds proof.</li>
+        <li><strong>Biosecurity — Critical:</strong> Australia has strict biosecurity laws. Declare all food, plant material, and animal products. Failure to declare attracts fines of AUD $420+ on the spot or criminal prosecution.</li>
+        <li><strong>Transitional Movements:</strong> Trans-Tasman Travel Arrangement allows free movement between Australia and New Zealand for citizens only. All others require separate visas for each country.</li>
+        <li><strong>Health:</strong> No mandatory vaccination requirements for most travelers. COVID-related rules may still apply — check Department of Home Affairs website before travel.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- General Rules -->
+<div class="terms-section" id="terms-general">
+  <div class="general-terms-grid">
+    <div class="general-term-card">
+      <div class="gtc-icon">📜</div>
+      <div class="gtc-title">Required Documents (All Routes)</div>
+      <ul class="terms-list" style="margin-top:10px;">
+        <li>Valid international passport (min. 6 months beyond travel dates)</li>
+        <li>Applicable visa or electronic authorization</li>
+        <li>Return or onward travel ticket</li>
+        <li>Proof of accommodation (hotel booking or host letter)</li>
+        <li>Travel health insurance (minimum $50,000 USD coverage)</li>
+        <li>Proof of sufficient funds (bank statements, 3 months)</li>
+      </ul>
+    </div>
+    <div class="general-term-card">
+      <div class="gtc-icon">🛂</div>
+      <div class="gtc-title">Border & Customs Rules</div>
+      <ul class="terms-list" style="margin-top:10px;">
+        <li>Declare all cash equivalents above equivalent of $10,000 USD</li>
+        <li>Prohibited items vary by country — research destination-specific restrictions</li>
+        <li>Electronic devices may be searched without warrant at border entry points</li>
+        <li>Overstaying your visa has serious long-term consequences including bans</li>
+      </ul>
+    </div>
+    <div class="general-term-card">
+      <div class="gtc-icon">⚖️</div>
+      <div class="gtc-title">Legal Obligations</div>
+      <ul class="terms-list" style="margin-top:10px;">
+        <li>Abide by all local laws and regulations in destination countries</li>
+        <li>Respect religious sites, dress codes, and cultural norms</li>
+        <li>Do not engage in unauthorized employment on tourist visas</li>
+        <li>Register with your home country's embassy in case of emergencies</li>
+      </ul>
+    </div>
+    <div class="general-term-card">
+      <div class="gtc-icon">🏥</div>
+      <div class="gtc-title">Health & Safety</div>
+      <ul class="terms-list" style="margin-top:10px;">
+        <li>Ensure vaccinations are current before travel — Yellow Fever card often mandatory</li>
+        <li>Carry prescription medication with official doctor's letter and documentation</li>
+        <li>Register emergency contacts with GlobalPath before departure</li>
+        <li>Purchase comprehensive travel insurance covering medical evacuation</li>
+      </ul>
+    </div>
+    <div class="general-term-card">
+      <div class="gtc-icon">🤝</div>
+      <div class="gtc-title">GlobalPath Service Terms</div>
+      <ul class="terms-list" style="margin-top:10px;">
+        <li>Service fees are non-refundable once application processing begins</li>
+        <li>Processing time begins only after all required documents are received</li>
+        <li>GlobalPath acts as facilitator; visa decisions rest solely with immigration authorities</li>
+        <li>Clients must inform GlobalPath of any changes to travel plans immediately</li>
+      </ul>
+    </div>
+    <div class="general-term-card">
+      <div class="gtc-icon">🔒</div>
+      <div class="gtc-title">Privacy & Data</div>
+      <ul class="terms-list" style="margin-top:10px;">
+        <li>Personal data submitted is processed per GDPR and applicable privacy laws</li>
+        <li>Documents are securely stored and never shared without explicit consent</li>
+        <li>You have the right to request deletion of your data at any time</li>
+        <li>All communications are encrypted end-to-end for your security</li>
+      </ul>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+</main>
+
+<!-- SUCCESS MODAL -->
+
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-icon">✅</div>
+    <div class="modal-title">Application Submitted!</div>
+    <div class="modal-text">Your immigration assessment has been successfully submitted. Our team will review your application and contact you within 5–10 business days.</div>
+    <div class="modal-ref" id="refNumber">REF: GP-000000</div>
+    <button class="btn btn-primary" onclick="closeModal()" style="width:100%;justify-content:center;">View My Submissions</button>
+  </div>
 </div>
 
 <script>
-function showTab(tab) {
-    document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-    document.getElementById(tab).classList.remove('hidden');
+  // ── STATE ──
+  let currentStep = 1;
+  const totalSteps = 5;
+  let isMarried = false;
+  let submissions = JSON.parse(localStorage.getItem('gp_submissions') || '[]');
+  let eduCount = 1;
 
-    document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-}
+  // ── TAB SWITCHING ──
+  function switchTab(tab, btn) {
+    if (btn.classList.contains('disabled')) return;
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    btn.classList.add('active');
+    if (tab === 'trips') updateTransactionsView();
+  }
 
-// Show spouse section if married
-document.getElementById('status').addEventListener('change', function() {
-    document.getElementById('spouseSection').classList.toggle('hidden', this.value !== "Married");
-});
+  // ── STEP NAVIGATION ──
+  function goToStep(n) {
+    document.querySelectorAll('.field-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + n).classList.add('active');
+    currentStep = n;
+    updateStepIndicator();
+  }
 
-// Dynamic children fields
-document.getElementById('childrenCount').addEventListener('input', function() {
-    let container = document.getElementById('childrenContainer');
-    container.innerHTML = "";
+  function nextStep(from) { if (from < totalSteps) goToStep(from + 1); }
+  function prevStep(from) { if (from > 1) goToStep(from - 1); }
 
-    for (let i = 1; i <= this.value; i++) {
-        container.innerHTML += `
-        <div class="section">
-            <h4>Child ${i}</h4>
-            <input placeholder="Name">
-            <input type="date">
-            <input placeholder="Gender">
+  function updateStepIndicator() {
+    document.querySelectorAll('.step').forEach((s, i) => {
+      s.classList.remove('active', 'done');
+      if (i + 1 < currentStep) s.classList.add('done'), s.querySelector('.step-num').textContent = '✓';
+      else if (i + 1 === currentStep) s.classList.add('active');
+      else s.querySelector('.step-num').textContent = i + 1;
+    });
+  }
+
+  // ── RADIO HELPERS ──
+  function handleRadio(groupId, input) {
+    document.querySelectorAll(`#${groupId} .radio-opt`).forEach(o => o.classList.remove('selected'));
+    input.closest('.radio-opt').classList.add('selected');
+  }
+
+  // ── SPOUSE TOGGLE ──
+  function toggleSpouse(show) {
+    isMarried = show;
+    document.getElementById('spouseFields').style.display = show ? 'block' : 'none';
+    document.getElementById('spouseNA').style.display = show ? 'none' : 'block';
+  }
+
+  // ── CHILDREN ──
+  function updateChildFields() {
+    const n = parseInt(document.getElementById('numChildren').value) || 0;
+    const container = document.getElementById('childrenContainer');
+    container.innerHTML = '';
+    for (let i = 0; i < Math.min(n, 20); i++) {
+      container.innerHTML += `
+        <div class="child-card">
+          <div class="child-card-title">Child ${i + 1}</div>
+          <div class="form-grid">
+            <div class="field-group"><label>Full Name</label><input type="text" placeholder="Child's full name" /></div>
+            <div class="field-group"><label>Date of Birth</label><input type="date" /></div>
+            <div class="field-group span-2"><label>Gender</label>
+              <div class="radio-group" id="childGender${i}">
+                <label class="radio-opt"><input type="radio" name="childGender${i}" onchange="handleRadio('childGender${i}',this)"> Male</label>
+                <label class="radio-opt"><input type="radio" name="childGender${i}" onchange="handleRadio('childGender${i}',this)"> Female</label>
+                <label class="radio-opt"><input type="radio" name="childGender${i}" onchange="handleRadio('childGender${i}',this)"> Other</label>
+              </div>
+            </div>
+          </div>
         </div>`;
     }
-});
+  }
 
-// Submit logic
-function submitForm() {
-    let name = document.getElementById('name').value;
+  // ── EDUCATION ──
+  function addEduRecord() {
+    eduCount++;
+    const container = document.getElementById('eduContainer');
+    const div = document.createElement('div');
+    div.className = 'edu-card';
+    div.id = `edu-${eduCount - 1}`;
+    div.innerHTML = `
+      <button class="remove-btn" onclick="this.closest('.edu-card').remove()">×</button>
+      <div class="edu-card-title">Education Record ${eduCount}</div>
+      <div class="form-grid">
+        <div class="field-group span-2"><label>Name of School / Institution</label><input type="text" placeholder="Institution name" /></div>
+        <div class="field-group"><label>Level / Degree Completed</label>
+          <select><option value="">Select level</option><option>Primary</option><option>Secondary / High School</option><option>Diploma / Certificate</option><option>Bachelor's Degree</option><option>Master's Degree</option><option>Doctorate (PhD)</option><option>Other</option></select>
+        </div>
+        <div class="field-group"><label>Date Completed</label><input type="date" /></div>
+        <div class="field-group"><label>Last Attended</label><input type="date" /></div>
+      </div>`;
+    container.appendChild(div);
+  }
 
-    if (!name) {
-        alert("Please enter your name");
-        return;
+  // ── UPLOADS ──
+  function triggerUpload(id) {
+    document.getElementById(id).click();
+  }
+
+  function handleFileUpload(input, zoneId, fnId) {
+    if (input.files && input.files[0]) {
+      const fname = input.files[0].name;
+      document.getElementById(fnId).textContent = '✓ ' + fname;
+      if (zoneId) document.getElementById(zoneId).classList.add('has-file');
     }
+  }
 
-    let entry = {
-        name: name,
-        status: "Processing",
-        date: new Date().toLocaleString()
-    };
+  // ── PDF FLOW ──
+  function showOnlineForm() {
+    document.getElementById('onlineFormSection').style.display = 'block';
+    document.getElementById('pdfUploadSection').style.display = 'none';
+  }
 
-    let data = JSON.parse(localStorage.getItem("transactions") || "[]");
-    data.push(entry);
-    localStorage.setItem("transactions", JSON.stringify(data));
+  function showPDFUpload() {
+    document.getElementById('onlineFormSection').style.display = 'none';
+    document.getElementById('pdfUploadSection').style.display = 'block';
+    document.getElementById('pdfUploadSection').classList.add('active');
+  }
 
-    loadTransactions();
+  function downloadPDF() {
+    // Creates a simple placeholder PDF-like content in a new window
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html><html><head><title>Immigration Assessment - GlobalPath</title>
+    <style>body{font-family:Georgia,serif;margin:40px;line-height:1.8;color:#222}h1{color:#0a1628;border-bottom:2px solid #c9a84c;padding-bottom:10px}h2{color:#1a3560;margin-top:30px}p{margin:6px 0}label{display:block;margin-top:12px;font-weight:bold;font-size:0.9em}input-line{border-bottom:1px solid #999;display:block;width:80%;height:24px;margin-top:4px}</style>
 
-    // Email trigger
-    window.location.href = `mailto:admin@email.com?subject=Immigration Application&body=New application from ${name}`;
+```
+</head><body>
+<h1>🌐 GlobalPath Immigration Assessment Questionnaire</h1>
+<p><em>Please print, fill in all sections, and submit via the portal.</em></p>
+<h2>Section A — Personal Information</h2>
+<label>1. Full Name:</label><div class="input-line">&nbsp;</div>
+<label>2. Phone Number:</label><div class="input-line">&nbsp;</div>
+<label>3. Date of Birth:</label><div class="input-line">&nbsp;</div>
+<label>4. Email Address:</label><div class="input-line">&nbsp;</div>
+<label>5. Place of Birth:</label><div class="input-line">&nbsp;</div>
+<label>6. Civil Status: [ ] Single  [ ] Married  [ ] Divorced  [ ] Widowed</label>
+<label>7. Gender: [ ] Male  [ ] Female  [ ] Prefer not to say  [ ] Other: ___________</label>
+<h2>Section B — Spouse Information</h2>
+<label>8. Spouse's Full Name:</label><div class="input-line">&nbsp;</div>
+<label>9. Spouse's Phone:</label><div class="input-line">&nbsp;</div>
+<label>10. Spouse's Email:</label><div class="input-line">&nbsp;</div>
+<label>11. Spouse's Date of Birth:</label><div class="input-line">&nbsp;</div>
+<label>12. Spouse's Gender: [ ] Male  [ ] Female  [ ] Other</label>
+<label>13. Spouse's Place of Birth:</label><div class="input-line">&nbsp;</div>
+<h2>Section C — Children Information</h2>
+<label>14. Number of Children:</label><div class="input-line">&nbsp;</div>
+<label>Child 1 — Name:</label><div class="input-line">&nbsp;</div>
+<label>Child 1 — DOB:</label><div class="input-line">&nbsp;</div>
+<label>Child 1 — Gender: [ ] Male  [ ] Female  [ ] Other</label>
+<label>Child 2 — Name:</label><div class="input-line">&nbsp;</div>
+<label>Child 2 — DOB:</label><div class="input-line">&nbsp;</div>
+<label>Child 2 — Gender: [ ] Male  [ ] Female  [ ] Other</label>
+<h2>Section D — Educational Attainment</h2>
+<label>Institution 1 — Name:</label><div class="input-line">&nbsp;</div>
+<label>Level / Degree:</label><div class="input-line">&nbsp;</div>
+<label>Date Completed:</label><div class="input-line">&nbsp;</div>
+<label>Last Attended:</label><div class="input-line">&nbsp;</div>
+<br><p>Please submit this form and your supporting documents via the GlobalPath portal.</p>
+<script>window.print();<\/script>
+</body></html>`);
+w.document.close();
+```
 
-    alert("Submission successful!");
 }
 
-// Load transactions
-function loadTransactions() {
-    let list = document.getElementById('transactionList');
-    list.innerHTML = "";
-
-    let data = JSON.parse(localStorage.getItem("transactions") || "[]");
-
-    data.forEach(item => {
-        list.innerHTML += `<li>${item.name} - ${item.status} (${item.date})</li>`;
-    });
+function handlePDFUpload(input) {
+if (input.files && input.files[0]) {
+document.getElementById(‘pdfFileName’).textContent = ‘✓ ’ + input.files[0].name + ’ uploaded’;
+document.getElementById(‘pdfBigZone’).style.borderColor = ‘var(–green)’;
+document.getElementById(‘pdfBigZone’).style.background = ‘rgba(76,175,125,0.05)’;
+}
 }
 
-loadTransactions();
+// ── SUBMIT ──
+function submitForm() {
+const name = document.getElementById(‘fullName’).value.trim() || ‘Applicant’;
+addSubmission(name, ‘Online Form’);
+}
+
+function submitPDFForm() {
+addSubmission(‘Applicant (PDF)’, ‘PDF Upload’);
+}
+
+function addSubmission(name, type) {
+const ref = ‘GP-’ + Math.floor(100000 + Math.random() * 900000);
+const entry = {
+ref, name, type,
+date: new Date().toLocaleDateString(‘en-GB’, { day: ‘2-digit’, month: ‘short’, year: ‘numeric’ }),
+status: ‘processing’
+};
+submissions.push(entry);
+localStorage.setItem(‘gp_submissions’, JSON.stringify(submissions));
+document.getElementById(‘refNumber’).textContent = ’REF: ’ + ref;
+document.getElementById(‘successModal’).classList.add(‘active’);
+}
+
+function closeModal() {
+document.getElementById(‘successModal’).classList.remove(‘active’);
+// Switch to trips tab
+document.querySelectorAll(’.tab-panel’).forEach(p => p.classList.remove(‘active’));
+document.querySelectorAll(’.nav-btn’).forEach(b => b.classList.remove(‘active’));
+document.getElementById(‘tab-trips’).classList.add(‘active’);
+document.querySelectorAll(’.nav-btn’)[1].classList.add(‘active’);
+updateTransactionsView();
+}
+
+// ── TRANSACTIONS VIEW ──
+function updateTransactionsView() {
+const total = submissions.length;
+const processing = submissions.filter(s => s.status === ‘processing’).length;
+const completed = submissions.filter(s => s.status === ‘completed’).length;
+
+```
+document.getElementById('stat-total').textContent = total;
+document.getElementById('stat-processing').textContent = processing;
+document.getElementById('stat-completed').textContent = completed;
+document.getElementById('stat-trips').textContent = completed;
+
+const emptyState = document.getElementById('emptyState');
+const txTable = document.getElementById('txTable');
+const noDataBadge = document.getElementById('noDataBadge');
+
+if (total === 0) {
+  emptyState.style.display = 'block';
+  txTable.style.display = 'none';
+  noDataBadge.textContent = 'No submissions yet';
+} else {
+  emptyState.style.display = 'none';
+  txTable.style.display = 'table';
+  noDataBadge.textContent = total + ' total submission' + (total > 1 ? 's' : '');
+
+  const tbody = document.getElementById('txBody');
+  tbody.innerHTML = submissions.map(s => `
+    <tr>
+      <td><span style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--gold);">${s.ref}</span></td>
+      <td>${s.name}<div class="sub">Applicant</div></td>
+      <td>${s.type}</td>
+      <td>${s.date}</td>
+      <td><span class="badge badge-${s.status}"><span class="badge-dot"></span>${s.status.charAt(0).toUpperCase() + s.status.slice(1)}</span></td>
+    </tr>`).join('');
+}
+```
+
+}
+
+// ── TERMS SECTIONS ──
+function showTermsSection(id, el) {
+document.querySelectorAll(’.terms-section’).forEach(s => s.classList.remove(‘active’));
+document.querySelectorAll(’.terms-tag’).forEach(t => t.classList.remove(‘active’));
+document.getElementById(‘terms-’ + id).classList.add(‘active’);
+el.classList.add(‘active’);
+}
+
+// ── INIT ──
+toggleSpouse(false);
+updateTransactionsView();
 </script>
 
 </body>
