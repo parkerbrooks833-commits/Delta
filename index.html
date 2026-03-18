@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Immigration Travel System</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f5f7fa;
+}
+
+nav {
+    display: flex;
+    background: #2c3e50;
+}
+
+nav button {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+}
+
+nav button:hover {
+    background: #34495e;
+}
+
+.active {
+    background: #1abc9c !important;
+}
+
+.container {
+    padding: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 15px;
+}
+
+.section {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+button.submit {
+    background: #1abc9c;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+<button onclick="showTab('home')" class="active">Home</button>
+<button onclick="showTab('transactions')">Trips & Transactions</button>
+<button onclick="showTab('terms')">Terms & Conditions</button>
+<button onclick="alert('This feature is currently inactive')">Travel Schedule</button>
+</nav>
+
+<div class="container">
+
+<!-- HOME -->
+<div id="home">
+
+<h2>Immigration Assessment</h2>
+
+<div class="section">
+<h3>Alternative Option</h3>
+<p>Download and fill manually:</p>
+<a href="#" download>Download PDF Form</a>
+<br><br>
+<label>Upload Completed PDF:</label>
+<input type="file" id="pdfUpload">
+</div>
+
+<form id="form">
+
+<div class="section">
+<h3>Personal Information</h3>
+<input placeholder="Full Name" id="name">
+<input placeholder="Phone Number">
+<input type="date">
+<input placeholder="Email">
+<input placeholder="Place of Birth">
+
+<select id="status">
+<option>Single</option>
+<option>Married</option>
+<option>Divorced</option>
+<option>Widowed</option>
+</select>
+
+<select>
+<option>Male</option>
+<option>Female</option>
+<option>Prefer not to say</option>
+<option>Other</option>
+</select>
+</div>
+
+<div class="section hidden" id="spouseSection">
+<h3>Spouse Info</h3>
+<input placeholder="Spouse Name">
+<input placeholder="Spouse Phone">
+<input placeholder="Spouse Email">
+<input type="date">
+<input placeholder="Spouse Place of Birth">
+</div>
+
+<div class="section">
+<h3>Children</h3>
+<input type="number" id="childrenCount" placeholder="Number of children">
+<div id="childrenContainer"></div>
+</div>
+
+<div class="section">
+<h3>Education</h3>
+<input placeholder="School Name">
+<input placeholder="Degree">
+<input type="date">
+<input placeholder="Last Attended">
+</div>
+
+<div class="section">
+<h3>Upload Required Documents</h3>
+<label>Passport Photo</label>
+<input type="file">
+
+<label>ID Card</label>
+<input type="file">
+
+<label>Travel Passport</label>
+<input type="file">
+
+<label>Guarantor ID</label>
+<input type="file">
+</div>
+
+<button type="button" class="submit" onclick="submitForm()">Submit</button>
+
+</form>
+</div>
+
+<!-- TRANSACTIONS -->
+<div id="transactions" class="hidden">
+<h2>Trips & Transactions</h2>
+<ul id="transactionList"></ul>
+</div>
+
+<!-- TERMS -->
+<div id="terms" class="hidden">
+<h2>Terms & Conditions</h2>
+
+<p><b>Regions Covered:</b></p>
+<ul>
+<li>Asia (Dubai, etc.)</li>
+<li>Africa (South Africa, Morocco)</li>
+<li>North America</li>
+<li>South America</li>
+<li>Europe</li>
+<li>Australia</li>
+</ul>
+
+<p><b>Requirements:</b></p>
+<ul>
+<li>Valid Passport</li>
+<li>Visa (where required)</li>
+<li>Health and travel insurance</li>
+<li>Proof of accommodation</li>
+<li>Financial capability</li>
+</ul>
+
+<p><b>Rules:</b></p>
+<ul>
+<li>Follow immigration laws of destination country</li>
+<li>No overstaying</li>
+<li>Respect transit country regulations</li>
+</ul>
+
+</div>
+
+</div>
+
+<script>
+function showTab(tab) {
+    document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById(tab).classList.remove('hidden');
+
+    document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+// Show spouse section if married
+document.getElementById('status').addEventListener('change', function() {
+    document.getElementById('spouseSection').classList.toggle('hidden', this.value !== "Married");
+});
+
+// Dynamic children fields
+document.getElementById('childrenCount').addEventListener('input', function() {
+    let container = document.getElementById('childrenContainer');
+    container.innerHTML = "";
+
+    for (let i = 1; i <= this.value; i++) {
+        container.innerHTML += `
+        <div class="section">
+            <h4>Child ${i}</h4>
+            <input placeholder="Name">
+            <input type="date">
+            <input placeholder="Gender">
+        </div>`;
+    }
+});
+
+// Submit logic
+function submitForm() {
+    let name = document.getElementById('name').value;
+
+    if (!name) {
+        alert("Please enter your name");
+        return;
+    }
+
+    let entry = {
+        name: name,
+        status: "Processing",
+        date: new Date().toLocaleString()
+    };
+
+    let data = JSON.parse(localStorage.getItem("transactions") || "[]");
+    data.push(entry);
+    localStorage.setItem("transactions", JSON.stringify(data));
+
+    loadTransactions();
+
+    // Email trigger
+    window.location.href = `mailto:admin@email.com?subject=Immigration Application&body=New application from ${name}`;
+
+    alert("Submission successful!");
+}
+
+// Load transactions
+function loadTransactions() {
+    let list = document.getElementById('transactionList');
+    list.innerHTML = "";
+
+    let data = JSON.parse(localStorage.getItem("transactions") || "[]");
+
+    data.forEach(item => {
+        list.innerHTML += `<li>${item.name} - ${item.status} (${item.date})</li>`;
+    });
+}
+
+loadTransactions();
+</script>
+
+</body>
+</html>
